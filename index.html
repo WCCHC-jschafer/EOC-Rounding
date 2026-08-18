@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="EOC Rounding">
+<title>EOC Rounding — WCCHC IC & Employee Health</title>
+<style>
+:root{
+  --ink:#21382c; --cream:#f7f5ee; --card:#fff; --green:#50A583; --greendark:#3d8268;
+  --sage:#6e8f7d; --ilima:#F2C65A; --clay:#b04a2f; --line:#e4e0d3;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--cream);color:var(--ink);font-family:-apple-system,'Segoe UI',Roboto,sans-serif;-webkit-text-size-adjust:100%}
+#app{max-width:560px;margin:0 auto;min-height:100vh}
+button{font-family:inherit;-webkit-tap-highlight-color:transparent}
+textarea,input{font-family:inherit;font-size:16px}
+.topbar{height:6px;background:var(--greendark)}
+header{padding:20px 20px 14px}
+.logo{width:210px;height:auto;display:block;margin-bottom:16px}
+.kicker{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--sage);font-weight:600}
+h1{margin:4px 0 0;font-size:26px;font-weight:700;line-height:1.15;color:var(--greendark)}
+.rule{height:4px;width:56px;background:var(--ilima);border-radius:2px;margin-top:10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin:8px 20px 4px}
+.card h3{margin:0 0 8px;font-size:14px;font-weight:600}
+.dept{width:100%;border:1.5px solid var(--line);border-radius:11px;padding:12px;font-size:15px;background:var(--cream);margin-bottom:10px}
+.btn{border:none;border-radius:11px;font-weight:600;cursor:pointer}
+.btn-primary{width:100%;background:var(--green);color:#fff;padding:13px 0;font-size:15px}
+.btn-primary:disabled{background:var(--line);color:var(--sage);cursor:default}
+.btn-dark{background:var(--ink);color:#fff}
+.btn-ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+.section{padding:6px 20px 40px}
+.sechead{font-size:12px;font-weight:600;color:var(--sage);text-transform:uppercase;letter-spacing:1.4px;margin:18px 0 10px}
+.empty{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;text-align:center;color:var(--sage);font-size:14px}
+.round{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;display:flex;align-items:center;gap:10px}
+.round.complete{border-left:4px solid var(--green)}
+.round.progress{border-left:4px solid var(--ilima)}
+.round .info{flex:1;min-width:0;cursor:pointer}
+.round .name{font-weight:600;font-size:15px}
+.round .meta{font-size:12px;color:var(--sage)}
+.round .open{background:var(--green);color:#fff;border:none;border-radius:9px;padding:8px 14px;font-weight:600;font-size:13px;cursor:pointer}
+.round .del{background:none;border:none;color:var(--sage);font-size:17px;cursor:pointer;padding:4px}
+.footer{text-align:center;margin-top:26px;padding-top:14px;border-top:1px solid var(--line);font-size:10.5px;color:var(--sage);letter-spacing:.6px}
+.warnbox{margin:10px 20px 0;background:#fdf1ec;border:1.5px solid var(--clay);border-radius:12px;padding:11px 13px;font-size:12.5px;line-height:1.45}
+.usage{margin:14px 20px 0;font-size:11.5px;color:var(--sage);text-align:center}
+/* inspect */
+.sticky{position:sticky;top:0;z-index:20;background:var(--cream);border-bottom:1px solid var(--line)}
+.shead{display:flex;align-items:center;padding:12px 16px 8px;gap:10px}
+.backbtn{background:none;border:none;font-size:20px;cursor:pointer;color:var(--ink);padding:2px}
+.stitle{flex:1;min-width:0}
+.stitle .t{font-weight:700;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stitle .m{font-size:11.5px;color:var(--sage)}
+.findct{color:var(--clay);font-weight:600}
+.savestate{font-size:11px;color:var(--sage);font-weight:500}
+.savestate.err{color:var(--clay);text-decoration:underline;cursor:pointer}
+.rail{display:flex;gap:8px;overflow-x:auto;padding:4px 16px 10px;-webkit-overflow-scrolling:touch}
+.pill{flex-shrink:0;display:flex;align-items:center;gap:6px;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:6px 11px 6px 7px;font-size:12px;font-weight:600;cursor:pointer}
+.pill.active{background:var(--ink);color:#fff}
+.pill.done{border-color:var(--green)}
+.pill .fbadge{background:var(--clay);color:#fff;border-radius:999px;font-size:10px;padding:1px 6px;font-weight:700}
+.locwrap{padding:14px 16px 110px}
+.locblock{margin-bottom:12px;scroll-margin-top:118px}
+.lochead{width:100%;display:flex;align-items:center;gap:10px;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:14px;padding:13px 14px;cursor:pointer;text-align:left;font-size:15px}
+.lochead.open{background:var(--green);color:#fff;border-color:var(--green);border-radius:14px 14px 0 0}
+.lochead .nm{flex:1;font-weight:600}
+.lochead .ct{font-size:12px;font-weight:600;opacity:.85}
+.locbody{background:var(--card);border:1px solid var(--line);border-top:none;border-radius:0 0 14px 14px;padding:4px 14px 14px}
+.markall{margin:10px 0 4px;background:none;border:1px dashed var(--sage);color:var(--sage);border-radius:9px;padding:7px 12px;font-size:12px;font-weight:600;cursor:pointer}
+.item{border-top:1px solid var(--line);padding:12px 0}
+.itxt{font-size:14px;line-height:1.4;margin-bottom:8px}
+.tri{display:flex;gap:6px}
+.tbtn{flex:1;padding:9px 0;border-radius:10px;border:1.5px solid var(--line);background:#fff;color:var(--sage);font-weight:600;font-size:13px;cursor:pointer}
+.tbtn.notmet{flex:1.2}
+.tbtn.on.met{background:var(--green);border-color:var(--green);color:#fff}
+.tbtn.on.notmet{background:var(--clay);border-color:var(--clay);color:#fff}
+.tbtn.on.na{background:var(--sage);border-color:var(--sage);color:#fff}
+.detail{margin-top:8px}
+.note{width:100%;border:1px solid var(--line);border-radius:10px;padding:9px;font-size:13.5px;background:var(--cream);resize:vertical}
+.note.nm{border-color:var(--clay)}
+.photorow{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;align-items:center}
+.ph{position:relative}
+.ph img{width:64px;height:64px;object-fit:cover;border-radius:8px;border:1px solid var(--line);display:block}
+.ph .x{position:absolute;top:-6px;right:-6px;background:var(--ink);color:#fff;border:none;border-radius:999px;width:20px;height:20px;font-size:11px;cursor:pointer;line-height:1}
+.addph{width:64px;height:40px;background:#fff;border:1.5px dashed var(--sage);border-radius:8px;color:var(--sage);font-size:12px;font-weight:600;cursor:pointer}
+.expand{margin-top:6px;background:none;border:none;color:var(--sage);font-size:12px;font-weight:600;cursor:pointer;padding:0}
+.gennotes{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:4px}
+.gennotes .h{font-weight:600;font-size:14px;margin-bottom:8px}
+.bottombar{position:fixed;bottom:0;left:0;right:0;max-width:560px;margin:0 auto;background:#fff;border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom));display:flex;gap:10px;z-index:30}
+.bottombar .btn{padding:12px 0;font-size:14px}
+.bb1{flex:1}.bb2{flex:1.4}
+/* report */
+.stats{display:flex;gap:10px;padding:8px 16px}
+.stat{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 8px;text-align:center}
+.stat .v{font-size:20px;font-weight:700}
+.stat .l{font-size:11px;color:var(--sage);font-weight:600;text-transform:uppercase;letter-spacing:.8px}
+.stat.g{border-top:3px solid var(--green)}
+.stat.c{border-top:3px solid var(--clay)}
+.stat.s{border-top:3px solid var(--sage)}
+.actions{padding:6px 16px;display:flex;flex-direction:column;gap:8px}
+.btn-pdf{width:100%;background:var(--greendark);color:#fff;padding:14px 0;font-size:15px}
+.btn-pdf:disabled{background:var(--sage)}
+.btn-share{width:100%;background:var(--ilima);color:var(--ink);padding:14px 0;font-size:15px;font-weight:700}
+.rowbtns{display:flex;gap:8px}
+.rowbtns .btn{flex:1;padding:12px 0;font-size:14px}
+.findsec{padding:10px 16px}
+.findloc{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--sage);margin:10px 0 6px}
+.finding{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--clay);border-radius:12px;padding:11px 13px;margin-bottom:8px}
+.finding .ft{font-size:14px;font-weight:600}
+.finding .fn{font-size:13px;opacity:.8;margin-top:4px}
+.finding .fp{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.finding .fp img{width:84px;height:84px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+.txtreport{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;font-size:11.5px;white-space:pre-wrap;word-break:break-word;font-family:ui-monospace,SFMono-Regular,monospace;margin:0 16px 30px}
+.rephead{display:flex;align-items:center;gap:10px;padding:12px 16px 6px}
+.rephead .t{font-weight:700;font-size:18px;color:var(--greendark)}
+.rephead .m{font-size:12px;color:var(--sage)}
+#toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-size:13px;font-weight:500;z-index:50;box-shadow:0 4px 14px rgba(0,0,0,.25);white-space:nowrap;display:none}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast"></div>
+<input type="file" id="photoInput" accept="image/*" multiple style="display:none">
+<script>
+"use strict";
+/* ============================================================
+   WCCHC IC & EH — Environment of Care Rounding (Standalone)
+   All data stored on this device (localStorage). No servers.
+   ============================================================ */
+var LOGO = "data:image/png;base64,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";
+
+var LOCATIONS = [
+  { id:"reception", name:"Reception & Waiting", icon:"\uD83E\uDE91", items:[
+    "Facemasks available for symptomatic patients",
+    "Hand hygiene (sanitizer) available for patients",
+    "Tissues and waste container available for patient use",
+    "Signage posted: hand hygiene / respiratory etiquette",
+    "Signage posted: notify staff of symptoms of illness",
+    "Furniture non-porous, clean, and in good condition",
+    "Waiting areas clean; space to separate symptomatic patients"
+  ]},
+  { id:"exam", name:"Exam & Treatment Rooms", icon:"\uD83E\uDE7A", items:[
+    "Floors, walls, counters, windowsills clean; walls free of breaks/penetrations",
+    "Exam table clean, operational, no tears or rips",
+    "Sink clean; nothing stored beneath sinks",
+    "Soap, paper towels, hand sanitizer stocked; dispensers operational",
+    "WCCHC-approved decontamination wipes available, not expired",
+    "PPE (gloves, masks, etc.) available per policy",
+    "Sharps container available, secured, not past fill line",
+    "No capped syringes in sharps containers; nothing stored on top",
+    "Regulated medical waste container present, covered, labeled, red bag in place",
+    "Contents of regulated medical waste containers appropriate",
+    "Waste containers clean, operational, not overfilled",
+    "Patient supplies stored in clean areas; no expired supplies",
+    "Irrigation & sterile solutions labeled per policy (open date)",
+    "Cubicle curtains clean and free of tears",
+    "No cork boards or unfinished wood in patient care areas",
+    "Safety-engineered sharps devices available and used appropriately"
+  ]},
+  { id:"isolation", name:"Isolation / Airborne", icon:"\uD83D\uDEAA", items:[
+    "Appropriate isolation signage posted",
+    "Isolation equipment and PPE readily accessible at point of use",
+    "Doors to patients on isolation precautions remain closed",
+    "Negative pressure supplied and verified (where required)",
+    "Air exchanges supplied as required (where applicable)",
+    "Staff can describe protocol for suspected airborne case at this site"
+  ]},
+  { id:"medprep", name:"Medication Prep Areas", icon:"\uD83D\uDC89", items:[
+    "Dedicated area identified for medication preparation",
+    "Area free of contaminated equipment and OPIM",
+    "No medications, IV solutions, or syringes unsecured/unattended",
+    "No expired medications",
+    "Multi-dose vials dated when opened; within beyond-use date (28 days)",
+    "Sink clean; soap, towels, sanitizer available and operational"
+  ]},
+  { id:"fridge", name:"Refrigerators & Freezers", icon:"\uD83E\uDDCA", items:[
+    "Medication refrigerator 36\u201346\u00B0F; checked and logged daily; remedial actions documented",
+    "Medication freezer \u221215 to \u221225\u00B0F; checked and logged daily",
+    "Specimen refrigerator 36\u201346\u00B0F; checked and logged daily",
+    "Only medications in medication refrigerator",
+    "Only specimens in specimen refrigerator; specimens labeled",
+    "Staff and patient food not mixed; food refrigerator clean",
+    "Vaccine units: data logger present, min/max logged twice daily (VFC)"
+  ]},
+  { id:"repro", name:"Reprocessing & Sterilization", icon:"\uD83E\uDDEA", items:[
+    "Appropriate soaking solutions and containers available",
+    "Containers clean, covered, labeled as required",
+    "Instruments/devices being processed correctly",
+    "Clean-to-dirty workflow separation; adequate space allotted",
+    "Sterilizers clean and functioning properly",
+    "Sterilizer preventive maintenance current",
+    "Sterilization parameters maintained",
+    "Chemical/biological monitors used per policy",
+    "Sterilization records and documentation complete",
+    "Processed device storage prevents contamination",
+    "High-level disinfectants monitored per manufacturer (test strips, dating)",
+    "PPE readily available in reprocessing area"
+  ]},
+  { id:"utility", name:"Utility & Storage Rooms", icon:"\uD83D\uDCE6", items:[
+    "Adequate separation of clean and soiled",
+    "Soiled utility: door closed and locked; no clean items stored",
+    "Soiled utility: red biohazard containers covered; counters/floors clutter-free",
+    "Clean utility: door closed; no dirty items; no outside shipping boxes",
+    "Supplies 18\" from ceiling and 6\" off floor; nothing under sinks",
+    "Patient supplies within expiration dates",
+    "Event-related sterile items labeled appropriately",
+    "Clean linen covered on carts; no items on top; no bags on floor",
+    "Soiled linen containers not overfilled",
+    "No supplies stored in bathrooms or soiled utility rooms"
+  ]},
+  { id:"staff", name:"Staff Areas & Employee Health", icon:"\u2615", items:[
+    "Food limited to lounges, conference rooms, private offices",
+    "Covered drinks only on low surfaces; none near specimen areas",
+    "Staff can state procedure for reporting BBP/chemical exposure or work injury",
+    "Eyewash stations checked weekly and documented on log",
+    "N95s available; staff fit-testing current for this department",
+    "Staff can state how to access SDS information"
+  ]},
+  { id:"general", name:"General Environment", icon:"\uD83C\uDFE5", items:[
+    "RED housekeeping (blood/OPIM) cleaning supplies available",
+    "BLUE housekeeping (airborne decontamination) supplies available",
+    "GREEN housekeeping (pest decontamination) supplies available",
+    "Specimens bagged, handled, labeled per policy; specimen bags not misused",
+    "All chemicals and liquid bottles appropriately labeled",
+    "EVS carts and chemicals secured, inaccessible to public",
+    "Vent grills clean; high-level dusting performed",
+    "Area free of pests; free of water leaks or spills"
+  ]}
+];
+var TOTAL_ITEMS = LOCATIONS.reduce(function(n,l){ return n + l.items.length; }, 0);
+
+/* ------------------ On-device storage ------------------ */
+var KEY = "eoc-standalone-v1";
+function loadDB(){
+  try { var r = localStorage.getItem(KEY); return r ? JSON.parse(r) : { order:[], insp:{} }; }
+  catch(e){ return { order:[], insp:{} }; }
+}
+var DB = loadDB();
+var saveTimer = null;
+function persist(){
+  setSaveState("saving");
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(function(){
+    try {
+      localStorage.setItem(KEY, JSON.stringify(DB));
+      setSaveState("saved");
+    } catch(e){
+      console.error("save failed", e);
+      setSaveState("error");
+      toast("Save failed \u2014 phone storage may be full. Export PDFs, then delete old rounds.");
+    }
+  }, 400);
+}
+function usageBytes(){
+  try { return (localStorage.getItem(KEY) || "").length; } catch(e){ return 0; }
+}
+
+/* ------------------ App state ------------------ */
+var S = { screen:"home", id:null, openLoc:null, saveState:"saved", expanded:{}, pdfBusy:false };
+var PDF = null; // { blob, url, fname }
+var photoTarget = null; // item id currently receiving photos
+
+function cur(){ return S.id ? DB.insp[S.id] : null; }
+function esc(s){
+  return String(s == null ? "" : s)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+function toast(msg){
+  var t = document.getElementById("toast");
+  t.textContent = msg; t.style.display = "block";
+  clearTimeout(t._tm);
+  t._tm = setTimeout(function(){ t.style.display = "none"; }, 2600);
+}
+function setSaveState(st){
+  S.saveState = st;
+  var el = document.getElementById("savestate");
+  if (el){
+    el.className = "savestate" + (st === "error" ? " err" : "");
+    el.textContent = st === "saving" ? "Saving\u2026" : st === "error" ? "Save failed \u2014 tap to retry" : "Saved \u2713";
+  }
+}
+
+/* ------------------ Photo compression ------------------ */
+function compressImage(file, maxDim, quality){
+  maxDim = maxDim || 640; quality = quality || 0.55;
+  return new Promise(function(resolve, reject){
+    var reader = new FileReader();
+    reader.onload = function(e){
+      var img = new Image();
+      img.onload = function(){
+        var w = img.width, h = img.height;
+        if (w > h && w > maxDim){ h = Math.round(h * maxDim / w); w = maxDim; }
+        else if (h > maxDim){ w = Math.round(w * maxDim / h); h = maxDim; }
+        var c = document.createElement("canvas");
+        c.width = w; c.height = h;
+        c.getContext("2d").drawImage(img, 0, 0, w, h);
+        resolve(c.toDataURL("image/jpeg", quality));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+/* ------------------ Derived ------------------ */
+function locStats(insp, loc){
+  var done = 0, findings = 0;
+  loc.items.forEach(function(_, i){
+    var it = insp.items[loc.id + "-" + i];
+    if (it && it.status) done++;
+    if (it && it.status === "notmet") findings++;
+  });
+  return { done: done, findings: findings, total: loc.items.length };
+}
+function totals(insp){
+  var done = 0, findings = 0, photos = 0;
+  LOCATIONS.forEach(function(loc){
+    loc.items.forEach(function(_, i){
+      var it = insp.items[loc.id + "-" + i];
+      if (it && it.status) done++;
+      if (it && it.status === "notmet") findings++;
+      photos += (it && it.photos ? it.photos.length : 0);
+    });
+  });
+  return { done: done, findings: findings, photos: photos };
+}
+function getItem(insp, id){
+  if (!insp.items[id]) insp.items[id] = { status:null, note:"", photos:[] };
+  return insp.items[id];
+}
+
+/* ------------------ Text report ------------------ */
+function buildReport(insp){
+  var t = totals(insp), lines = [];
+  lines.push("WCCHC ENVIRONMENT OF CARE ROUNDING \u2014 IC & EMPLOYEE HEALTH");
+  lines.push("Department: " + insp.department);
+  lines.push("Date: " + insp.date);
+  lines.push("Items assessed: " + t.done + "/" + TOTAL_ITEMS + "   Findings (Not Met): " + t.findings);
+  lines.push("");
+  LOCATIONS.forEach(function(loc){
+    var rows = [];
+    loc.items.forEach(function(text, i){
+      var it = insp.items[loc.id + "-" + i];
+      if (!it || !it.status) return;
+      if (it.status === "notmet"){
+        rows.push("  [NOT MET] " + text + (it.note ? " \u2014 " + it.note : "") + (it.photos && it.photos.length ? " (" + it.photos.length + " photo" + (it.photos.length > 1 ? "s" : "") + ")" : ""));
+      } else if (it.status === "na" && it.note){
+        rows.push("  [N/A] " + text + " \u2014 " + it.note);
+      } else if (it.status === "met" && it.note){
+        rows.push("  [MET] " + text + " \u2014 " + it.note);
+      }
+    });
+    var s = locStats(insp, loc);
+    lines.push(loc.name.toUpperCase() + " \u2014 " + s.done + "/" + s.total + " assessed, " + s.findings + " finding" + (s.findings === 1 ? "" : "s"));
+    if (rows.length) lines = lines.concat(rows);
+    lines.push("");
+  });
+  if (insp.generalNotes && insp.generalNotes.trim()){
+    lines.push("GENERAL NOTES");
+    lines.push(insp.generalNotes.trim());
+  }
+  return lines.join("\n");
+}
+
+/* ------------------ PDF ------------------ */
+var jspdfPromise = null;
+function loadJsPDF(){
+  if (window.jspdf) return Promise.resolve(window.jspdf);
+  if (!jspdfPromise){
+    jspdfPromise = new Promise(function(resolve, reject){
+      var s = document.createElement("script");
+      s.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+      s.onload = function(){ resolve(window.jspdf); };
+      s.onerror = function(){ jspdfPromise = null; reject(new Error("Could not load PDF library \u2014 internet required for PDF export")); };
+      document.head.appendChild(s);
+    });
+  }
+  return jspdfPromise;
+}
+function imgDims(dataUrl){
+  return new Promise(function(resolve){
+    var img = new Image();
+    img.onload = function(){ resolve({ w: img.width || 4, h: img.height || 3 }); };
+    img.onerror = function(){ resolve({ w: 4, h: 3 }); };
+    img.src = dataUrl;
+  });
+}
+async function buildPdf(){
+  var insp = cur();
+  if (!insp || S.pdfBusy) return;
+  S.pdfBusy = true; render();
+  try {
+    var lib = await loadJsPDF();
+    var doc = new lib.jsPDF({ unit:"pt", format:"letter" });
+    var W = 612, H = 792, M = 54, maxW = W - 2 * M, y = M;
+    function pageBreak(need){ if (y + need > H - 60){ doc.addPage(); y = M; } }
+
+    doc.addImage(LOGO, "PNG", M, y, 122, 43); y += 60;
+    doc.setFont("helvetica","bold"); doc.setFontSize(16); doc.setTextColor(33,56,44);
+    doc.text("Environment of Care Rounding", M, y); y += 17;
+    doc.setFontSize(11); doc.setTextColor(110,143,125);
+    doc.text("Infection Control & Employee Health", M, y); y += 22;
+    var t = totals(insp);
+    doc.setFont("helvetica","normal"); doc.setFontSize(10); doc.setTextColor(33,56,44);
+    doc.text("Department: " + insp.department, M, y); y += 14;
+    doc.text("Date of inspection: " + insp.date, M, y); y += 14;
+    doc.text("Items assessed: " + t.done + " of " + TOTAL_ITEMS + "     Findings (Not Met): " + t.findings, M, y); y += 10;
+    doc.setDrawColor(242,198,90); doc.setLineWidth(3); doc.line(M, y, M + 90, y); y += 20;
+
+    for (var li = 0; li < LOCATIONS.length; li++){
+      var loc = LOCATIONS[li];
+      var s = locStats(insp, loc);
+      if (s.done === 0) continue;
+      var rows = [];
+      loc.items.forEach(function(text, i){
+        var it = insp.items[loc.id + "-" + i];
+        if (!it || !it.status) return;
+        if (it.status === "notmet")
+          rows.push({ tag:"NOT MET", text:text, note:it.note, photos:it.photos || [], color:[176,74,47] });
+        else if (it.note)
+          rows.push({ tag: it.status === "na" ? "N/A" : "MET", text:text, note:it.note, photos:it.photos || [], color: it.status === "na" ? [110,143,125] : [80,165,131] });
+      });
+
+      pageBreak(46);
+      doc.setFillColor(80,165,131); doc.rect(M, y, maxW, 20, "F");
+      doc.setFont("helvetica","bold"); doc.setFontSize(10); doc.setTextColor(255,255,255);
+      doc.text(loc.name + "  \u2014  " + s.done + "/" + s.total + " assessed, " + s.findings + " finding" + (s.findings === 1 ? "" : "s"), M + 8, y + 13.5);
+      y += 28;
+
+      if (!rows.length){
+        doc.setFont("helvetica","italic"); doc.setFontSize(9.5); doc.setTextColor(110,143,125);
+        doc.text("No findings; no comments recorded.", M + 4, y); y += 18;
+        continue;
+      }
+      for (var ri = 0; ri < rows.length; ri++){
+        var r = rows[ri];
+        doc.setFontSize(9.5); doc.setFont("helvetica","bold");
+        var headLines = doc.splitTextToSize("[" + r.tag + "]  " + r.text, maxW - 8);
+        doc.setFont("helvetica","normal");
+        var noteLines = r.note ? doc.splitTextToSize(r.note, maxW - 20) : [];
+        pageBreak(headLines.length * 12 + noteLines.length * 11 + 14);
+        doc.setFont("helvetica","bold"); doc.setTextColor(r.color[0], r.color[1], r.color[2]);
+        doc.text(headLines, M + 4, y); y += headLines.length * 12;
+        if (noteLines.length){
+          doc.setFont("helvetica","normal"); doc.setTextColor(70,70,70);
+          doc.text(noteLines, M + 14, y); y += noteLines.length * 11;
+        }
+        if (r.photos.length){
+          y += 4;
+          var pw = 150, x = M + 14, rowH = 0;
+          for (var pi = 0; pi < r.photos.length; pi++){
+            var p = r.photos[pi];
+            var d = await imgDims(p);
+            var ph = Math.min(Math.round(pw * d.h / d.w), 220);
+            if (x + pw > W - M){ y += rowH + 8; x = M + 14; rowH = 0; }
+            if (y + ph > H - 60){ doc.addPage(); y = M; x = M + 14; rowH = 0; }
+            try { doc.addImage(p, "JPEG", x, y, pw, ph); } catch(e){ console.error("photo embed failed", e); }
+            rowH = Math.max(rowH, ph); x += pw + 8;
+          }
+          y += rowH + 10;
+        }
+        y += 8;
+      }
+      y += 4;
+    }
+
+    if (insp.generalNotes && insp.generalNotes.trim()){
+      pageBreak(40);
+      doc.setFillColor(33,56,44); doc.rect(M, y, maxW, 20, "F");
+      doc.setFont("helvetica","bold"); doc.setFontSize(10); doc.setTextColor(255,255,255);
+      doc.text("General Notes", M + 8, y + 13.5); y += 28;
+      doc.setFont("helvetica","normal"); doc.setFontSize(9.5); doc.setTextColor(33,56,44);
+      var gLines = doc.splitTextToSize(insp.generalNotes.trim(), maxW - 8);
+      for (var gi = 0; gi < gLines.length; gi += 40){
+        var chunk = gLines.slice(gi, gi + 40);
+        pageBreak(chunk.length * 12 + 6);
+        doc.text(chunk, M + 4, y); y += chunk.length * 12;
+      }
+    }
+
+    var pages = doc.getNumberOfPages();
+    for (var pg = 1; pg <= pages; pg++){
+      doc.setPage(pg);
+      doc.setFont("helvetica","normal"); doc.setFontSize(8); doc.setTextColor(110,143,125);
+      doc.text("Waianae Coast Comprehensive Health Center \u2014 EOC Rounding, IC & Employee Health", M, H - 36);
+      doc.text("Page " + pg + " of " + pages, W - M, H - 36, { align:"right" });
+    }
+
+    var fname = "EOC_" + insp.department.replace(/[^\w\u00C0-\u024F-]+/g, "_") + "_" + insp.date + ".pdf";
+    var blob = doc.output("blob");
+    if (PDF && PDF.url) URL.revokeObjectURL(PDF.url);
+    PDF = { blob: blob, url: URL.createObjectURL(blob), fname: fname };
+    toast("PDF built \u2014 tap Share / save below");
+  } catch(e){
+    console.error(e);
+    toast(e && e.message ? e.message : "PDF generation failed \u2014 retry");
+  } finally {
+    S.pdfBusy = false; render();
+  }
+}
+async function sharePdf(){
+  if (!PDF) return;
+  try {
+    var f = new File([PDF.blob], PDF.fname, { type:"application/pdf" });
+    if (navigator.canShare && navigator.canShare({ files:[f] })){
+      await navigator.share({ files:[f], title: PDF.fname });
+      return;
+    }
+  } catch(e){
+    if (e && e.name === "AbortError") return;
+    console.error("share failed", e);
+  }
+  try {
+    var a = document.createElement("a");
+    a.href = PDF.url; a.download = PDF.fname;
+    document.body.appendChild(a); a.click(); a.remove();
+    return;
+  } catch(e){ console.error("download failed", e); }
+  window.open(PDF.url, "_blank");
+}
+
+/* ------------------ Render ------------------ */
+function render(){
+  var scrollY = window.scrollY;
+  var app = document.getElementById("app");
+  if (S.screen === "home") app.innerHTML = homeHTML();
+  else if (S.screen === "inspect") app.innerHTML = inspectHTML();
+  else if (S.screen === "report") app.innerHTML = reportHTML();
+  window.scrollTo(0, scrollY);
+}
+
+function homeHTML(){
+  var list = DB.order.map(function(id){
+    var x = DB.insp[id];
+    if (!x) return "";
+    var complete = x.status === "complete";
+    return '<div class="round ' + (complete ? "complete" : "progress") + '">' +
+      '<div class="info" data-open="' + id + '"><div class="name">' + esc(x.department) + '</div>' +
+      '<div class="meta">' + esc(x.date) + ' \u00B7 ' + (complete ? "Complete" : "In progress") + '</div></div>' +
+      '<button class="open" data-open="' + id + '">' + (complete ? "View" : "Resume") + '</button>' +
+      '<button class="del" data-del="' + id + '" aria-label="Delete">\u2715</button></div>';
+  }).join("");
+  var kb = usageBytes();
+  var usage = kb ? '<div class="usage">Device storage used by this app: ' + (kb / 1048576).toFixed(1) + ' MB. Export PDFs, then delete old rounds to free space.</div>' : "";
+  return '<div class="topbar"></div>' +
+    '<header><img class="logo" src="' + LOGO + '" alt="Waianae Coast Comprehensive Health Center">' +
+    '<div class="kicker">Infection Control \u00B7 Employee Health</div><h1>EOC Rounding</h1><div class="rule"></div></header>' +
+    '<div class="card"><h3>Start a new round</h3>' +
+    '<input class="dept" id="deptInput" placeholder="Department or clinic (e.g., Dental Clinic)">' +
+    '<button class="btn btn-primary" id="startBtn" disabled>Begin inspection</button></div>' +
+    usage +
+    '<div class="section"><div class="sechead">Past & in-progress rounds</div>' +
+    (list || '<div class="empty">No inspections yet. Enter a department above to start your first round.</div>') +
+    '<div class="footer">WAIANAE COAST COMPREHENSIVE HEALTH CENTER \u00B7 SERVING WEST OAHU SINCE 1972<br>All data is stored on this device only.</div></div>';
+}
+
+function inspectHTML(){
+  var insp = cur();
+  var t = totals(insp);
+  var rail = LOCATIONS.map(function(loc){
+    var s = locStats(insp, loc);
+    var cls = "pill" + (S.openLoc === loc.id ? " active" : "") + (s.done === s.total ? " done" : "");
+    return '<button class="' + cls + '" data-loc="' + loc.id + '" data-scroll="1">' +
+      ring(s.done, s.total) + '<span>' + esc(loc.name) + '</span>' +
+      (s.findings ? '<span class="fbadge">' + s.findings + '</span>' : "") + '</button>';
+  }).join("");
+  var blocks = LOCATIONS.map(function(loc){
+    var s = locStats(insp, loc);
+    var open = S.openLoc === loc.id;
+    var body = "";
+    if (open){
+      var itemsHtml = loc.items.map(function(text, i){ return itemHTML(insp, loc.id + "-" + i, text); }).join("");
+      body = '<div class="locbody"><button class="markall" data-markall="' + loc.id + '">\u2713 Mark all remaining in this area as Met</button>' + itemsHtml + '</div>';
+    }
+    return '<div class="locblock" id="loc-' + loc.id + '">' +
+      '<button class="lochead' + (open ? " open" : "") + '" data-loc="' + loc.id + '">' +
+      '<span>' + loc.icon + '</span><span class="nm">' + esc(loc.name) + '</span>' +
+      '<span class="ct">' + s.done + '/' + s.total + '</span><span>' + (open ? "\u25BE" : "\u25B8") + '</span></button>' + body + '</div>';
+  }).join("");
+  return '<div class="sticky"><div class="shead">' +
+    '<button class="backbtn" data-nav="home" aria-label="Back">\u2190</button>' +
+    '<div class="stitle"><div class="t">' + esc(insp.department) + '</div>' +
+    '<div class="m">' + esc(insp.date) + ' \u00B7 ' + t.done + '/' + TOTAL_ITEMS + ' assessed' +
+    (t.findings ? ' \u00B7 <span class="findct">' + t.findings + ' finding' + (t.findings > 1 ? "s" : "") + '</span>' : "") + '</div></div>' +
+    '<div id="savestate" class="savestate' + (S.saveState === "error" ? " err" : "") + '">' +
+    (S.saveState === "saving" ? "Saving\u2026" : S.saveState === "error" ? "Save failed \u2014 tap to retry" : "Saved \u2713") + '</div></div>' +
+    '<div class="rail">' + rail + '</div></div>' +
+    '<div class="locwrap">' + blocks +
+    '<div class="gennotes"><div class="h">General notes for this visit</div>' +
+    '<textarea class="note" id="generalNotes" rows="3" placeholder="Observations, staff interviews, follow-ups\u2026">' + esc(insp.generalNotes || "") + '</textarea></div></div>' +
+    '<div class="bottombar"><button class="btn btn-ghost bb1" data-nav="report">Preview report</button>' +
+    '<button class="btn btn-dark bb2" data-finish="1">Finish inspection</button></div>';
+}
+
+function itemHTML(insp, id, text){
+  var it = insp.items[id] || { status:null, note:"", photos:[] };
+  var st = it.status;
+  var hasDetail = (it.note && it.note.length) || (it.photos && it.photos.length);
+  var showDetail = S.expanded[id] || st === "notmet" || hasDetail;
+  var tri = ["met","notmet","na"].map(function(v){
+    var label = v === "met" ? "Met" : v === "notmet" ? "Not met" : "N/A";
+    return '<button class="tbtn ' + v + (st === v ? " on" : "") + '" data-st="' + v + '" data-item="' + id + '">' + label + '</button>';
+  }).join("");
+  var detail = "";
+  if (showDetail){
+    var photos = (it.photos || []).map(function(p, i){
+      return '<div class="ph"><img src="' + p + '" alt="attached">' +
+        '<button class="x" data-delphoto="' + id + '" data-idx="' + i + '" aria-label="Remove photo">\u2715</button></div>';
+    }).join("");
+    detail = '<div class="detail">' +
+      '<textarea class="note' + (st === "notmet" ? " nm" : "") + '" rows="2" data-note="' + id + '" placeholder="' + (st === "notmet" ? "Describe the finding\u2026" : "Optional comment\u2026") + '">' + esc(it.note || "") + '</textarea>' +
+      '<div class="photorow">' + photos +
+      '<button class="addph" data-addphoto="' + id + '">\uD83D\uDCF7 Add</button></div></div>';
+  } else {
+    detail = '<button class="expand" data-expand="' + id + '">+ Add note or photo</button>';
+  }
+  return '<div class="item"><div class="itxt">' + esc(text) + '</div><div class="tri">' + tri + '</div>' + detail + '</div>';
+}
+
+function ring(done, total){
+  var size = 26, r = (size - 6) / 2, circ = 2 * Math.PI * r;
+  var pct = total ? done / total : 0;
+  var color = pct === 1 ? "#50A583" : "#F2C65A";
+  return '<svg width="' + size + '" height="' + size + '" style="flex-shrink:0">' +
+    '<circle cx="13" cy="13" r="' + r + '" fill="none" stroke="#e4e0d3" stroke-width="4"></circle>' +
+    '<circle cx="13" cy="13" r="' + r + '" fill="none" stroke="' + color + '" stroke-width="4" stroke-dasharray="' + circ + '" stroke-dashoffset="' + (circ * (1 - pct)) + '" stroke-linecap="round" transform="rotate(-90 13 13)"></circle>' +
+    '<text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-size="9" font-weight="700" fill="#21382c">' + done + '</text></svg>';
+}
+
+function reportHTML(){
+  var insp = cur();
+  var t = totals(insp);
+  var findingsHtml = "";
+  LOCATIONS.forEach(function(loc){
+    var f = [];
+    loc.items.forEach(function(text, i){
+      var it = insp.items[loc.id + "-" + i];
+      if (it && it.status === "notmet") f.push({ text:text, it:it });
+    });
+    if (!f.length) return;
+    findingsHtml += '<div class="findloc">' + loc.icon + ' ' + esc(loc.name) + '</div>' +
+      f.map(function(x){
+        var ph = (x.it.photos && x.it.photos.length) ?
+          '<div class="fp">' + x.it.photos.map(function(p){ return '<img src="' + p + '" alt="finding">'; }).join("") + '</div>' : "";
+        return '<div class="finding"><div class="ft">' + esc(x.text) + '</div>' +
+          (x.it.note ? '<div class="fn">' + esc(x.it.note) + '</div>' : "") + ph + '</div>';
+      }).join("");
+  });
+  if (!t.findings) findingsHtml = '<div class="empty">No "Not Met" findings recorded. \uD83C\uDF89</div>';
+  var shareBtn = (PDF && !S.pdfBusy) ? '<button class="btn btn-share" data-sharepdf="1">\uD83D\uDCE4 Share / save PDF \u2014 Files, email, AirDrop, print</button>' : "";
+  var secondBtn = insp.status === "complete" ?
+    '<button class="btn btn-ghost" data-reopen="1">Reopen & edit</button>' :
+    '<button class="btn btn-ghost" data-nav="inspect">Back to checklist</button>';
+  return '<div class="topbar"></div>' +
+    '<div style="padding:14px 16px 0"><img src="' + LOGO + '" alt="WCCHC" style="width:170px;height:auto;display:block"></div>' +
+    '<div class="rephead"><button class="backbtn" data-nav="home" aria-label="Home">\u2190</button>' +
+    '<div><div class="t">' + esc(insp.department) + '</div>' +
+    '<div class="m">' + esc(insp.date) + ' \u00B7 ' + (insp.status === "complete" ? "Complete" : "In progress") + '</div></div></div>' +
+    '<div class="stats">' +
+    '<div class="stat g"><div class="v">' + t.done + '/' + TOTAL_ITEMS + '</div><div class="l">Assessed</div></div>' +
+    '<div class="stat ' + (t.findings ? "c" : "g") + '"><div class="v">' + t.findings + '</div><div class="l">Findings</div></div>' +
+    '<div class="stat s"><div class="v">' + t.photos + '</div><div class="l">Photos</div></div></div>' +
+    '<div class="actions">' +
+    '<button class="btn btn-pdf" data-buildpdf="1"' + (S.pdfBusy ? " disabled" : "") + '>' +
+    (S.pdfBusy ? "Building PDF\u2026" : PDF ? "\uD83D\uDD04 Rebuild PDF report" : "\uD83D\uDCC4 Build PDF report (findings + photos)") + '</button>' +
+    shareBtn +
+    '<div class="rowbtns"><button class="btn btn-ghost" data-copy="1">Copy report text</button>' + secondBtn + '</div></div>' +
+    '<div class="findsec">' + findingsHtml +
+    '<div class="findloc" style="margin-top:16px">Text report (copy above, or long-press to select)</div></div>' +
+    '<pre class="txtreport">' + esc(buildReport(insp)) + '</pre>';
+}
+
+/* ------------------ Events ------------------ */
+document.addEventListener("click", function(e){
+  var el = e.target.closest("[data-open],[data-del],[data-nav],[data-loc],[data-st],[data-expand],[data-addphoto],[data-delphoto],[data-markall],[data-finish],[data-reopen],[data-copy],[data-buildpdf],[data-sharepdf],#startBtn,#savestate");
+  if (!el) return;
+
+  if (el.id === "startBtn"){
+    var dept = (document.getElementById("deptInput").value || "").trim();
+    if (!dept) return;
+    var now = new Date();
+    var id = now.getTime().toString(36);
+    DB.insp[id] = { id:id, department:dept, date:now.toISOString().slice(0,10), createdAt:now.toISOString(), status:"in-progress", items:{}, generalNotes:"" };
+    DB.order.unshift(id);
+    persist();
+    S.id = id; S.screen = "inspect"; S.openLoc = LOCATIONS[0].id; S.expanded = {}; PDF = null;
+    render();
+    return;
+  }
+  if (el.id === "savestate"){
+    if (S.saveState === "error") persist();
+    return;
+  }
+  if (el.dataset.open){
+    S.id = el.dataset.open; PDF = null; S.expanded = {}; S.openLoc = null;
+    S.screen = DB.insp[S.id].status === "complete" ? "report" : "inspect";
+    render(); window.scrollTo(0,0);
+    return;
+  }
+  if (el.dataset.del){
+    var x = DB.insp[el.dataset.del];
+    if (x && confirm("Delete the " + x.department + " inspection from " + x.date + "? This cannot be undone.")){
+      delete DB.insp[el.dataset.del];
+      DB.order = DB.order.filter(function(i){ return i !== el.dataset.del; });
+      persist(); render(); toast("Inspection deleted");
+    }
+    return;
+  }
+  if (el.dataset.nav){
+    S.screen = el.dataset.nav; render(); window.scrollTo(0,0);
+    return;
+  }
+  if (el.dataset.loc){
+    S.openLoc = (S.openLoc === el.dataset.loc && !el.dataset.scroll) ? null : el.dataset.loc;
+    render();
+    if (el.dataset.scroll){
+      var target = document.getElementById("loc-" + el.dataset.loc);
+      if (target) setTimeout(function(){ target.scrollIntoView({ behavior:"smooth", block:"start" }); }, 60);
+    }
+    return;
+  }
+  if (el.dataset.st){
+    var it = getItem(cur(), el.dataset.item);
+    it.status = (it.status === el.dataset.st) ? null : el.dataset.st;
+    persist(); render();
+    return;
+  }
+  if (el.dataset.expand){
+    S.expanded[el.dataset.expand] = true; render();
+    return;
+  }
+  if (el.dataset.addphoto){
+    var itp = getItem(cur(), el.dataset.addphoto);
+    if ((itp.photos || []).length >= 4){ toast("Max 4 photos per item"); return; }
+    photoTarget = el.dataset.addphoto;
+    document.getElementById("photoInput").click();
+    return;
+  }
+  if (el.dataset.delphoto){
+    var itd = getItem(cur(), el.dataset.delphoto);
+    itd.photos.splice(Number(el.dataset.idx), 1);
+    persist(); render();
+    return;
+  }
+  if (el.dataset.markall){
+    var locId = el.dataset.markall;
+    var loc = LOCATIONS.find(function(l){ return l.id === locId; });
+    loc.items.forEach(function(_, i){
+      var iti = getItem(cur(), locId + "-" + i);
+      if (!iti.status) iti.status = "met";
+    });
+    persist(); render();
+    return;
+  }
+  if (el.dataset.finish){
+    var insp = cur();
+    insp.status = "complete"; insp.completedAt = new Date().toISOString();
+    persist(); S.screen = "report"; render(); window.scrollTo(0,0);
+    return;
+  }
+  if (el.dataset.reopen){
+    cur().status = "in-progress";
+    persist(); S.screen = "inspect"; render(); window.scrollTo(0,0);
+    return;
+  }
+  if (el.dataset.copy){
+    var text = buildReport(cur());
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ toast("Report copied to clipboard"); },
+        function(){ toast("Copy failed \u2014 long-press the text to copy"); });
+    } else toast("Copy failed \u2014 long-press the text to copy");
+    return;
+  }
+  if (el.dataset.buildpdf){ buildPdf(); return; }
+  if (el.dataset.sharepdf){ sharePdf(); return; }
+});
+
+document.addEventListener("input", function(e){
+  var el = e.target;
+  if (el.id === "deptInput"){
+    document.getElementById("startBtn").disabled = !el.value.trim();
+    return;
+  }
+  if (el.id === "generalNotes"){
+    cur().generalNotes = el.value; persist();
+    return;
+  }
+  if (el.dataset && el.dataset.note){
+    getItem(cur(), el.dataset.note).note = el.value; persist();
+    return;
+  }
+});
+
+document.getElementById("photoInput").addEventListener("change", async function(e){
+  var files = Array.prototype.slice.call(e.target.files || []);
+  e.target.value = "";
+  if (!files.length || !photoTarget) return;
+  var it = getItem(cur(), photoTarget);
+  var room = 4 - (it.photos || []).length;
+  if (room <= 0){ toast("Max 4 photos per item"); return; }
+  if (files.length > room) toast("Only " + room + " more photo" + (room > 1 ? "s" : "") + " fit \u2014 max 4 per item");
+  var list = files.slice(0, room);
+  for (var i = 0; i < list.length; i++){
+    try {
+      var dataUrl = await compressImage(list[i]);
+      it.photos.push(dataUrl);
+    } catch(err){
+      console.error(err);
+      toast("Could not process a photo \u2014 skipped it");
+    }
+  }
+  photoTarget = null;
+  persist(); render();
+});
+
+render();
+</script>
+</body>
+</html>
